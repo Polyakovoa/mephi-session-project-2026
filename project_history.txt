@@ -1,0 +1,116 @@
+    1  ip link show
+    2  nmcli connection show
+    3  sudo nmcli connection modify "Проводное подключение 2" con-name "Mephi"
+    4  sudo nmcli connection modify "Mephi" ipv4.method manual ipv4.addresses 192.168.1.100/24
+    5  sudo nmcli connection modify "Mephi" ipv4.gateway 192.168.1.1
+    6  sudo nmcli connection modify "Mephi" ipv4.dns 8.8.8.8
+    7  sudo nmcli connection modify "Mephi" connection.autoconnect yes
+    8  sudo nmcli connection up "Mephi"
+    9  ip addr show enp0s8
+   10  ip route show
+   11  sudo hostnamectl set-hostname mephi-2026.domain.local
+   12  hostnamectl
+   13  sudo nmcli connection modify "Проводное подключение 1" ipv4.gateway ""
+   14  sudo nmcli connection down "Проводное подключение 1"
+   15  sudo nmcli connection up "Проводное подключение 1"
+   16  ip route show
+   17  ping -c 4 192.168.1.1
+   18  ping -c 4 8.8.8.8
+   19  ping -c 4 8.8.8.8 > /tmp/network_check.txt
+   20  ping -c 4 192.168.1.1 >> /tmp/network_check.txt
+   21  cat /tmp/network_check.txt
+   22  sudo dnf install -y nginx
+   23  rpm -q nginx
+   24  systemctl status nginx --no-pager
+   25  sudo dnf install -y tcpdump
+   26  sudo dnf install -y libcap-ng-utils
+   27  rpm -q tcpdump libcap-ng-utils
+   28  which tcpdump
+   29  which getcap
+   30  which setcap
+   31  cd /tmp
+   32  dnf download tcpdump --destdir=/tmp
+   33  ls -la /tmp/tcpdump*.rpm
+   34  sudo rpm -ivh /tmp/tcpdump*.rpm --replacepkgs
+   35  rpm -q tcpdump
+   36  tcpdump --version
+   37  sudo rpm -e tcpdump-4.99.5-6.fc43.x86_64
+   38  sudo rpm -ivh /tmp/tcpdump-4.99.6-2.fc43.x86_64.rpm
+   39  rpm -q tcpdump
+   40  lsblk
+   41  sudo fdisk /dev/sdb
+   42  lsblk
+   43  sudo mkfs.ext4 -L MEPHI_DATA /dev/sdb1
+   44  sudo mkdir -p /data/mephi-web
+   45  echo "LABEL=MEPHI_DATA /data/mephi-web ext4 defaults 0 2" | sudo tee -a /etc/fstab
+   46  cat /etc/fstab
+   47  sudo mount -a
+   48  sudo systemctl daemon-reload
+   49  sudo mount -a
+   50  df -h /data/mephi-web
+   51  lsblk
+   52  lsblk -f /dev/sdb1
+   53  sudo systemctl start nginx
+   54  sudo systemctl enable nginx
+   55  sudo systemctl status nginx --no-pager
+   56  ss -tlnp | grep :80
+   57  curl -I http://localhost
+   58  sudo journalctl -u nginx --since "5 min ago" > /tmp/nginx_recent_logs.txt
+   59  cat /tmp/nginx_recent_logs.txt
+   60  sudo useradd -m mephi-admin
+   61  echo "mephi-admin:P@ssw0rd2026" | sudo chpasswd
+   62  sudo groupadd mephi-devs
+   63  sudo usermod -aG mephi-devs mephi-admin
+   64  id mephi-admin
+   65  getent group mephi-devs
+   66  sudo chown -R mephi-admin:mephi-devs /data/mephi-web
+   67  sudo chmod 2775 /data/mephi-web
+   68  ls -ld /data/mephi-web
+   69  sestatus
+   70  ls -Z /data/mephi-web
+   71  sudo semanage fcontext -a -t httpd_sys_content_t "/data/mephi-web(/.*)?"
+   72  sudo restorecon -Rv /data/mephi-web
+   73  ls -Z /data/mephi-web
+   74  ls -l /usr/bin/tcpdump
+   75  getcap /usr/bin/tcpdump
+   76  sudo chmod u-s /usr/bin/tcpdump
+   77  sudo setcap cap_net_raw,cap_net_admin+ep /usr/bin/tcpdump
+   78  getcap /usr/bin/tcpdump
+   79  sudo -u mephi-admin tcpdump --help
+   80  echo "root" | sudo tee /etc/ssh/denied_users
+   81  sudo nano /etc/pam.d/login
+   82  sudo nano /etc/pam.d/sshd
+   83  grep pam_listfile /etc/pam.d/login
+   84  grep pam_listfile /etc/pam.d/sshd
+   85  su - root
+   86  sudo -i -u mephi-admin
+   87  echo "Hello from Student: M255-1074" | sudo tee /data/mephi-web/index.html
+   88  cat /data/mephi-web/index.html
+   89  sudo nano /etc/nginx/conf.d/mephi.conf
+   90  sudo nginx -t
+   91  sudo systemctl restart nginx
+   92  sudo systemctl status nginx --no-pager
+   93  curl http://localhost
+   94  curl http://192.168.1.100
+   95  ls -la /etc/nginx/conf.d/
+   96  sudo ss -tlnp | grep nginx
+   97  getent hosts localhost
+   98  curl http://127.0.0.1
+   99  sudo tee /etc/hosts << EOF
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost6 localhost6.localdomain6
+127.0.1.1   mephi-2026.domain.local mephi-2026
+EOF
+  100  sudo systemctl restart systemd-resolved
+  101  getent hosts localhost
+  102  curl http://localhost
+  103  curl -6 http://localhost
+  104  sudo nano /etc/nginx/conf.d/mephi.conf
+  105  sudo nginx -t
+  106  sudo systemctl restart nginx
+  107  curl http://localhost
+  108  curl http://192.168.1.100
+  109  sudo ip route del 192.168.1.0/24 dev enp0s3
+  110  sudo ip neigh add 192.168.1.1 lladdr 0a:00:27:00:00:0c dev enp0s8 nud permanent
+  111  ping -c 4 192.168.1.1
+  112  history > ~/project_history.txt
